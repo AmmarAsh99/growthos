@@ -71,4 +71,4 @@ jobs:
           file: apps/api/Dockerfile
           target: build
           push: true
-          tags: ${{ env.DOCKER_HUB_USER }}/growthos-frontend:${{ env.COMMIT_SHA }}
+          tags: ${{ env.DOCKER_HUB_USER }}/growthos-db-push:${{ env.COMMIT_SHA }}
