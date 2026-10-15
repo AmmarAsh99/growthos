@@ -25,4 +25,4 @@ jobs:
         with:
           context: '{{defaultContext}}:apps/web'
           push: true
-          tags: ${{DOCKER_HUB_USER}}/growthos-frontend:${{COMMIT_SHA}}
+          tags: ${{ env.DOCKER_HUB_USER }}/growthos-frontend:${{ env.COMMIT_SHA }}
