@@ -15,7 +15,7 @@ spec:
         app: growthos
     spec:
       containers:
-      - name: growthos
-        image: growthos:1.14.2
-        ports:
-        - containerPort: 80
+        - name: growthos
+          image: growthos:1.14.2
+          ports:
+            - containerPort: 80
