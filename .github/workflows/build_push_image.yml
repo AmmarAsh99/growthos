@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   COMMIT_SHA: ${{ github.sha }}
-  DOCKER_HUB_USER: ammarrepo
+  DOCKER_HUB_USER: 'ammarrepo'
 
 jobs:
   Build-push-Frontend:
