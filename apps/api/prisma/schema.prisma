@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique @db.VarChar(254)
+  displayName String @db.VarChar(80)
+  passwordHash String
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  settings UserSettings?
+  categories Category[]
+  activities Activity[]
+  sessions RefreshSession[]
+  @@map("users")
+}
+model UserSettings {
+  userId String @id @db.Uuid
+  dailyGoalMinutes Int @default(120)
+  timezone String @default("Asia/Riyadh") @db.VarChar(100)
+  weekStart Int @default(1) @db.SmallInt
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("user_settings")
+}
+model Category {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  name String @db.VarChar(60)
+  slug String @db.VarChar(80)
+  color String @db.VarChar(7)
+  icon String? @db.VarChar(40)
+  isArchived Boolean @default(false)
+  sortOrder Int @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities Activity[]
+  @@unique([userId, slug])
+  @@unique([id, userId])
+  @@map("categories")
+}
+model Activity {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  categoryId String @db.Uuid
+  activityDate DateTime @db.Date
+  title String @db.VarChar(120)
+  description String?
+  durationMinutes Int
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId, userId], references: [id, userId])
+  @@index([userId, activityDate(sort: Desc)])
+  @@index([userId, categoryId, activityDate(sort: Desc)])
+  @@map("activities")
+}
+model RefreshSession {
+  id String @id @db.Uuid
+  userId String @db.Uuid
+  refreshTokenHash String
+  expiresAt DateTime @db.Timestamptz
+  revokedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, expiresAt])
+  @@map("refresh_sessions")
+}

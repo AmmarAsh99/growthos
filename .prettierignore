@@ -1,0 +1,11 @@
+node_modules
+.tools
+dist
+.angular
+package-lock.json
+apps/api/src/generated
+GROWTHOS_CODEX_STARTER
+GROWTHOS_BLUEPRINT.md
+CODEX_BUILD_PROMPT.md
+test-results
+playwright-report
