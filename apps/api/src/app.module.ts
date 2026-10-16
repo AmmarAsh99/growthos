@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { FinanceModule } from './finance/finance.module.js';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
@@ -22,6 +23,7 @@ import { logger } from './telemetry/logging.js';
       },
     }),
     PrismaModule,
+    FinanceModule,
     AuthModule,
     UsersModule,
     CategoriesModule,

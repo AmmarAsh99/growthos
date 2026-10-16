@@ -51,6 +51,7 @@ export async function createApp() {
           statusCode: res.statusCode,
           durationMs,
           userId: req.user?.id,
+          errorCode: res.locals.errorCode,
         },
         'HTTP request completed',
       );
@@ -65,6 +66,7 @@ export async function createApp() {
       req.headers.origin &&
       req.headers.origin !== config.origin
     ) {
+      res.locals.errorCode = 'ORIGIN_REJECTED';
       res.status(403).json({
         success: false,
         error: { code: 'ORIGIN_REJECTED', message: 'Origin not allowed' },

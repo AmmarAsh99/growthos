@@ -20,7 +20,7 @@ test('register, configure, log, reload, edit and delete through Angular', async 
   await page.getByLabel('Daily goal in minutes').fill('120');
   await page.getByRole('button', { name: 'Save settings' }).click();
   await expect(page.getByRole('status')).toContainText('Settings saved');
-  await page.getByRole('link', { name: 'Log activity', exact: true }).click();
+  await page.getByRole('link', { name: 'Add Activity', exact: true }).click();
   await page.getByRole('button', { name: 'Save activity' }).click();
   await expect(page.getByRole('alert')).toContainText('Choose a date and category');
   await page.getByLabel('What did you work on?').fill('Learned ArgoCD');

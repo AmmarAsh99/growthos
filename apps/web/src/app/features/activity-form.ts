@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../core/language';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, type AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -5,65 +6,66 @@ import { Api, Auth, Notice, errorMessage } from '../core/api';
 import type { Activity, Category } from '../core/models';
 import { localDate, validDuration } from '../shared/format';
 @Component({
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [TranslatePipe, ReactiveFormsModule, RouterLink],
   template: `<div class="page-heading">
       <div>
-        <div class="eyebrow">MAKE YOUR TIME COUNT</div>
-        <h1>{{ id ? 'Edit activity' : 'Log an activity' }}<span class="heading-dot">.</span></h1>
-        <p>A small investment in yourself, worth remembering.</p>
+        <div class="eyebrow">{{ 'MAKE YOUR TIME COUNT' | t }}</div>
+        <h1>
+          {{ (id ? 'Edit activity' : 'Log an activity') | t }}<span class="heading-dot">.</span>
+        </h1>
+        <p>{{ 'A small investment in yourself, worth remembering.' | t }}</p>
       </div>
-      <a routerLink="/activities" class="button secondary">← Activity history</a>
+      <a routerLink="/activities" class="button secondary">{{ '← Activity history' | t }}</a>
     </div>
     <div class="form-layout">
       <section class="card form-card">
         @if (loading()) {
-          <p role="status">Loading your activity…</p>
+          <p role="status">{{ 'Loading your activity…' | t }}</p>
         } @else {
           <form [formGroup]="form" (ngSubmit)="save()">
-            <h2>The details</h2>
+            <h2>{{ 'The details' | t }}</h2>
             <div class="form-grid">
               <label
-                >Activity date<input
-                  type="date"
-                  formControlName="activityDate"
-                  [max]="today" /></label
+                >{{ 'Activity date' | t
+                }}<input type="date" formControlName="activityDate" [max]="today" /></label
               ><label
-                >Category<select formControlName="categoryId" aria-label="Category">
-                  <option value="">Choose a category</option>
+                >{{ 'Category' | t
+                }}<select formControlName="categoryId" [attr.aria-label]="'Category' | t">
+                  <option value="">{{ 'Choose a category' | t }}</option>
                   @for (c of categories(); track c.id) {
                     <option [value]="c.id" [disabled]="c.isArchived && c.id !== originalCategory">
                       {{ c.name }}{{ c.isArchived ? ' (archived)' : '' }}
                     </option>
                   }</select
-                ><a routerLink="/categories" class="field-link">Manage categories ↗</a></label
+                ><a routerLink="/categories" class="field-link">{{
+                  'Manage categories ↗' | t
+                }}</a></label
               >
             </div>
             <label
-              >What did you work on?<input
+              >{{ 'What did you work on?' | t
+              }}<input
                 formControlName="title"
                 placeholder="e.g. ArgoCD fundamentals"
                 minlength="2"
                 maxlength="120"
             /></label>
             <fieldset>
-              <legend>Time invested</legend>
+              <legend>{{ 'Time invested' | t }}</legend>
               <div class="duration-fields">
                 <label
-                  >Hours<input
-                    type="number"
-                    formControlName="hours"
-                    min="0"
-                    max="24"
-                    step="1" /></label
+                  >{{ 'Hours' | t
+                  }}<input type="number" formControlName="hours" min="0" max="24" step="1" /></label
                 ><span>:</span
                 ><label
-                  >Minutes<input type="number" formControlName="minutes" min="0" max="59" step="1"
+                  >{{ 'Minutes' | t
+                  }}<input type="number" formControlName="minutes" min="0" max="59" step="1"
                 /></label>
               </div>
-              <small>Between 1 minute and 24 hours. Use whole numbers.</small>
+              <small>{{ 'Between 1 minute and 24 hours. Use whole numbers.' | t }}</small>
             </fieldset>
             <label
-              >Notes <span class="muted">(optional)</span
+              >{{ 'Notes' | t }}<span class="muted">{{ '(optional)' | t }}</span
               ><textarea
                 formControlName="description"
                 rows="5"
@@ -73,17 +75,19 @@ import { localDate, validDuration } from '../shared/format';
             </label>
             @if (form.touched && form.invalid) {
               <p class="field-error" role="alert">
-                Choose a date and category, enter a title (2–120 characters), and a duration from 1
-                minute to 24 hours.
+                {{
+                  'Choose a date and category, enter a title (2–120 characters), and a duration from 1 minute to 24 hours.'
+                    | t
+                }}
               </p>
             }
             @if (error()) {
               <p class="error" role="alert">{{ error() }}</p>
             }
             <div class="form-actions">
-              <a class="button secondary" routerLink="/dashboard">Cancel</a
+              <a class="button secondary" routerLink="/dashboard">{{ 'Cancel' | t }}</a
               ><button class="primary" [disabled]="busy()">
-                {{ busy() ? 'Saving…' : id ? 'Save changes' : '✓ Save activity' }}
+                {{ (busy() ? 'Saving…' : id ? 'Save changes' : '✓ Save activity') | t }}
               </button>
             </div>
           </form>
@@ -91,13 +95,13 @@ import { localDate, validDuration } from '../shared/format';
       </section>
       <aside class="card form-aside">
         <span class="spark">✦</span>
-        <h2>It all adds up.</h2>
-        <p>Reading a chapter. Practicing a skill. Making time to move.</p>
-        <p>There’s no perfect entry. Just an honest record of the time you invested.</p>
+        <h2>{{ 'It all adds up.' | t }}</h2>
+        <p>{{ 'Reading a chapter. Practicing a skill. Making time to move.' | t }}</p>
+        <p>{{ 'There’s no perfect entry. Just an honest record of the time you invested.' | t }}</p>
         <hr />
-        <small
-          >Your entries shape your charts and goal progress. You can always edit them later.</small
-        >
+        <small>{{
+          'Your entries shape your charts and goal progress. You can always edit them later.' | t
+        }}</small>
       </aside>
     </div>`,
 })

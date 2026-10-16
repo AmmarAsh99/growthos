@@ -7,6 +7,38 @@ const signedOut: CanActivateFn = () =>
   !inject(Auth).user() ? true : inject(Router).createUrlTree(['/dashboard']);
 export const routes: Routes = [
   {
+    path: 'finance',
+    canActivate: [signedIn],
+    loadComponent: () => import('./features/finance-dashboard').then((m) => m.FinanceDashboardPage),
+  },
+  {
+    path: 'finance/new',
+    canActivate: [signedIn],
+    loadComponent: () => import('./features/finance-form').then((m) => m.FinanceFormPage),
+  },
+  {
+    path: 'finance/transactions/:id/edit',
+    canActivate: [signedIn],
+    loadComponent: () => import('./features/finance-form').then((m) => m.FinanceFormPage),
+  },
+  {
+    path: 'finance/transactions',
+    canActivate: [signedIn],
+    loadComponent: () =>
+      import('./features/finance-transactions').then((m) => m.FinanceTransactionsPage),
+  },
+  {
+    path: 'finance/budgets',
+    canActivate: [signedIn],
+    loadComponent: () => import('./features/finance-budgets').then((m) => m.FinanceBudgetsPage),
+  },
+  {
+    path: 'finance/reports',
+    data: { report: true },
+    canActivate: [signedIn],
+    loadComponent: () => import('./features/finance-dashboard').then((m) => m.FinanceDashboardPage),
+  },
+  {
     path: 'login',
     canActivate: [signedOut],
     loadComponent: () => import('./features/auth').then((m) => m.AuthPage),

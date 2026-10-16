@@ -4,6 +4,15 @@ A self-hostable personal activity tracker. Record time spent learning, exercisin
 reading, or pursuing your own goals, then see accurate calendar-based trends.
 Logged time measures investment and consistency, not skill mastery.
 
+GrowthOS also includes a personal finance workspace: salary allocations, expense/income/transfer
+entry, transaction filters, budget forecasts and monthly reports. Light, Dark and System themes
+apply across both workspaces. See [finance setup and accounting](docs/finance-implementation.md).
+
+**Existing installations:** no new container environment variables or application dependencies
+are required for finance. Rebuild the API, frontend and migration images, and run `npm run db:migrate`
+using the existing `DATABASE_URL` before deploying the new API. The additive migration preserves
+existing users and activity records. Salary and savings defaults are plans, not fabricated payments.
+
 ## Quick start: Docker
 
 Requires Docker Compose and Node to create your local configuration. No npm install

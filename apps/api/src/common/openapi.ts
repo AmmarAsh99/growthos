@@ -161,7 +161,7 @@ export function documentEnvelopes(document: OpenAPIObject) {
     },
   };
   for (const [path, item] of Object.entries(document.paths)) {
-    for (const method of ['get', 'post', 'patch', 'delete'] as const) {
+    for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
       const operation = item?.[method];
       if (!operation) continue;
       if (!/\/auth\/(register|login|refresh|logout)$/.test(path) && !path.includes('/health/')) {
@@ -175,29 +175,47 @@ export function documentEnvelopes(document: OpenAPIObject) {
             : '200';
       if (code !== '204') {
         const ref = (model: (typeof responseModels)[number]) => ({ $ref: getSchemaPath(model) });
-        const data = path.endsWith('/dashboard/overview')
-          ? { $ref: getSchemaPath(OverviewResponse) }
-          : /\/analytics\/(trends|heatmap)$/.test(path)
-            ? { type: 'array' as const, items: { $ref: getSchemaPath(BucketResponse) } }
-            : path.endsWith('/analytics/categories')
-              ? { type: 'array' as const, items: ref(BreakdownResponse) }
-              : path.endsWith('/analytics/activities-summary')
-                ? ref(SummaryResponse)
-                : path.endsWith('/users/me/settings')
-                  ? ref(SettingsResponse)
-                  : path.endsWith('/auth/me')
-                    ? ref(UserResponse)
-                    : /\/auth\/(register|login|refresh)$/.test(path)
-                      ? ref(AuthResponse)
-                      : path.endsWith('/categories') && method === 'get'
-                        ? { type: 'array' as const, items: ref(CategoryResponse) }
-                        : path.includes('/categories')
-                          ? ref(CategoryResponse)
-                          : path.endsWith('/activities') && method === 'get'
-                            ? ref(ActivityPageResponse)
-                            : path.includes('/activities')
-                              ? ref(ActivityResponse)
-                              : { type: 'object' as const, additionalProperties: true };
+        const data = path.includes('/finance/')
+          ? path.endsWith('/categories')
+            ? {
+                type: 'array' as const,
+                items: {
+                  type: 'object' as const,
+                  properties: {
+                    id: { type: 'string' as const, format: 'uuid' },
+                    name: { type: 'string' as const },
+                  },
+                },
+              }
+            : {
+                type: 'object' as const,
+                additionalProperties: true,
+                description:
+                  'Finance contract documented in common/finance-contracts.ts. Monetary fields are integer halalas.',
+              }
+          : path.endsWith('/dashboard/overview')
+            ? { $ref: getSchemaPath(OverviewResponse) }
+            : /\/analytics\/(trends|heatmap)$/.test(path)
+              ? { type: 'array' as const, items: { $ref: getSchemaPath(BucketResponse) } }
+              : path.endsWith('/analytics/categories')
+                ? { type: 'array' as const, items: ref(BreakdownResponse) }
+                : path.endsWith('/analytics/activities-summary')
+                  ? ref(SummaryResponse)
+                  : path.endsWith('/users/me/settings')
+                    ? ref(SettingsResponse)
+                    : path.endsWith('/auth/me')
+                      ? ref(UserResponse)
+                      : /\/auth\/(register|login|refresh)$/.test(path)
+                        ? ref(AuthResponse)
+                        : path.endsWith('/categories') && method === 'get'
+                          ? { type: 'array' as const, items: ref(CategoryResponse) }
+                          : path.includes('/categories')
+                            ? ref(CategoryResponse)
+                            : path.endsWith('/activities') && method === 'get'
+                              ? ref(ActivityPageResponse)
+                              : path.includes('/activities')
+                                ? ref(ActivityResponse)
+                                : { type: 'object' as const, additionalProperties: true };
         operation.responses[code] = {
           description: 'Successful JSON envelope',
           headers: { 'X-Request-Id': { schema: { type: 'string' } } },

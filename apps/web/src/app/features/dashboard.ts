@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../core/language';
 import { Component, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -8,15 +9,17 @@ import { DurationPipe } from '../shared/format';
 import { GrowthChart } from '../shared/chart';
 import type { ChartData } from 'chart.js';
 @Component({
-  imports: [RouterLink, FormsModule, DecimalPipe, DurationPipe, GrowthChart],
+  imports: [TranslatePipe, RouterLink, FormsModule, DecimalPipe, DurationPipe, GrowthChart],
   template: `
     <div class="page-heading">
       <div>
-        <div class="eyebrow">YOUR GROWTH, AT A GLANCE</div>
-        <h1>Keep growing, {{ auth.user()?.displayName }}<span class="heading-dot">.</span></h1>
-        <p>Small steps today. A stronger foundation tomorrow.</p>
+        <div class="eyebrow">{{ 'YOUR GROWTH, AT A GLANCE' | t }}</div>
+        <h1>
+          {{ 'Keep growing,' | t }} {{ auth.user()?.displayName }}<span class="heading-dot">.</span>
+        </h1>
+        <p>{{ 'Small steps today. A stronger foundation tomorrow.' | t }}</p>
       </div>
-      <a class="button primary" routerLink="/activities/new">＋ Log activity</a>
+      <a class="button primary" routerLink="/activities/new">{{ '＋ Log activity' | t }}</a>
     </div>
     <div class="filterbar">
       <span class="date-label"
@@ -24,24 +27,24 @@ import type { ChartData } from 'chart.js';
         <span class="muted">· {{ auth.user()?.settings?.timezone }}</span></span
       >
       <div>
-        <label class="sr-only" for="dashboard-category">Filter category</label
+        <label class="sr-only" for="dashboard-category">{{ 'Filter category' | t }}</label
         ><select id="dashboard-category" [(ngModel)]="categoryId" (change)="load()">
-          <option value="">All categories</option>
+          <option value="">{{ 'All categories' | t }}</option>
           @for (c of categories(); track c.id) {
             <option [value]="c.id">{{ c.name }}</option>
           }</select
-        ><label class="sr-only" for="period">Selected period</label
+        ><label class="sr-only" for="period">{{ 'Selected period' | t }}</label
         ><select id="period" [(ngModel)]="period" (change)="load()">
-          <option value="day">Today</option>
-          <option value="week">This week</option>
-          <option value="month">This month</option>
-          <option value="year">This year</option>
+          <option value="day">{{ 'Today' | t }}</option>
+          <option value="week">{{ 'This week' | t }}</option>
+          <option value="month">{{ 'This month' | t }}</option>
+          <option value="year">{{ 'This year' | t }}</option>
         </select>
       </div>
     </div>
     @if (error()) {
       <div class="error" role="alert">
-        {{ error() }} <button (click)="load()">Try again</button>
+        {{ error() }} <button (click)="load()">{{ 'Try again' | t }}</button>
       </div>
     }
     @if (loading()) {
@@ -55,7 +58,7 @@ import type { ChartData } from 'chart.js';
         @for (card of cards(); track card.label) {
           <article class="card metric">
             <div class="metric-label">
-              {{ card.label
+              {{ card.label | t
               }}<span class="metric-icon" [class.cyan]="card.label === 'This week'">{{
                 card.icon
               }}</span>
@@ -75,8 +78,12 @@ import type { ChartData } from 'chart.js';
           </article>
         }
         <article class="card metric streak">
-          <div class="metric-label">Active streak<span class="metric-icon amber">ϟ</span></div>
-          <div class="metric-value">{{ o.currentActivityStreakDays }}<span> days</span></div>
+          <div class="metric-label">
+            {{ 'Active streak' | t }}<span class="metric-icon amber">ϟ</span>
+          </div>
+          <div class="metric-value">
+            {{ o.currentActivityStreakDays }}<span> {{ 'days' | t }}</span>
+          </div>
           <p>
             {{
               o.currentActivityStreakDays
@@ -85,7 +92,9 @@ import type { ChartData } from 'chart.js';
             }}
           </p>
           <small
-            >Consecutive days with activity.<br />Today or yesterday can be the last day.</small
+            >{{ 'Consecutive days with activity.' | t }}<br />{{
+              'Today or yesterday can be the last day.' | t
+            }}</small
           >
         </article>
       </div>
@@ -100,19 +109,21 @@ import type { ChartData } from 'chart.js';
         <div>
           <span class="fact-icon">▦</span>
           <p>
-            <small>Active days</small><strong>{{ o.selectedPeriod.activeDays }}</strong>
+            <small>{{ 'Active days' | t }}</small
+            ><strong>{{ o.selectedPeriod.activeDays }}</strong>
           </p>
         </div>
         <div>
           <span class="fact-icon">✓</span>
           <p>
-            <small>Activities logged</small><strong>{{ o.selectedPeriod.activityCount }}</strong>
+            <small>{{ 'Activities logged' | t }}</small
+            ><strong>{{ o.selectedPeriod.activityCount }}</strong>
           </p>
         </div>
         <div>
           <span class="fact-icon">↗</span>
           <p>
-            <small>Logged time vs previous period</small
+            <small>{{ 'Logged time vs previous period' | t }}</small
             ><strong
               [title]="
                 'Equivalent elapsed calendar days; prior period clamped to its length. Comparison: ' +
@@ -133,18 +144,18 @@ import type { ChartData } from 'chart.js';
         <section class="card">
           <div class="section-heading">
             <div>
-              <h2>Time invested</h2>
-              <p>Showing up adds up.</p>
+              <h2>{{ 'Time invested' | t }}</h2>
+              <p>{{ 'Showing up adds up.' | t }}</p>
             </div>
             <label
-              ><span class="sr-only">Trend range</span
+              ><span class="sr-only">{{ 'Trend range' | t }}</span
               ><select [(ngModel)]="range" (change)="load()">
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="weeks">Last 12 weeks</option>
-                <option value="months">Last 12 months</option>
-                <option value="years">Last 5 years</option>
+                <option value="7">{{ 'Last 7 days' | t }}</option>
+                <option value="30">{{ 'Last 30 days' | t }}</option>
+                <option value="90">{{ 'Last 90 days' | t }}</option>
+                <option value="weeks">{{ 'Last 12 weeks' | t }}</option>
+                <option value="months">{{ 'Last 12 months' | t }}</option>
+                <option value="years">{{ 'Last 5 years' | t }}</option>
               </select></label
             >
           </div>
@@ -156,7 +167,7 @@ import type { ChartData } from 'chart.js';
         <section class="card">
           <div class="section-heading">
             <div>
-              <h2>Where your time goes</h2>
+              <h2>{{ 'Where your time goes' | t }}</h2>
               <p>Category breakdown · {{ period }}</p>
             </div>
             <span>◉</span>
@@ -179,9 +190,13 @@ import type { ChartData } from 'chart.js';
           } @else {
             <div class="empty">
               <span>◉</span>
-              <h3>A fresh canvas</h3>
-              <p>Log your first activity to see<br />where you invest your time.</p>
-              <a routerLink="/activities/new">Log an activity →</a>
+              <h3>{{ 'A fresh canvas' | t }}</h3>
+              <p>
+                {{ 'Log your first activity to see' | t }}<br />{{
+                  'where you invest your time.' | t
+                }}
+              </p>
+              <a routerLink="/activities/new">{{ 'Log an activity →' | t }}</a>
             </div>
           }
         </section>
@@ -189,8 +204,8 @@ import type { ChartData } from 'chart.js';
       <section class="card heatmap-card">
         <div class="section-heading">
           <div>
-            <h2>A little more consistent</h2>
-            <p>Your last 90 days. Every square is a day.</p>
+            <h2>{{ 'A little more consistent' | t }}</h2>
+            <p>{{ 'Your last 90 days. Every square is a day.' | t }}</p>
           </div>
           <span class="muted">{{ heatmapActive() }} active days</span>
         </div>
@@ -206,17 +221,17 @@ import type { ChartData } from 'chart.js';
           }
         </div>
         <div class="heatmap-footer">
-          <span>Consistency is built one day at a time.</span
-          ><span>Less <i></i><i></i><i></i><i></i> More</span>
+          <span>{{ 'Consistency is built one day at a time.' | t }}</span
+          ><span>{{ 'Less' | t }}<i></i><i></i><i></i><i></i> {{ 'More' | t }}</span>
         </div>
       </section>
       <section class="card recent">
         <div class="section-heading">
           <div>
-            <h2>Recent activities</h2>
-            <p>Your latest investments in yourself.</p>
+            <h2>{{ 'Recent activities' | t }}</h2>
+            <p>{{ 'Your latest investments in yourself.' | t }}</p>
           </div>
-          <a routerLink="/activities">View all →</a>
+          <a routerLink="/activities">{{ 'View all →' | t }}</a>
         </div>
         @for (a of recent(); track a.id) {
           <a class="activity-row" [routerLink]="['/activities', a.id, 'edit']"
@@ -240,8 +255,10 @@ import type { ChartData } from 'chart.js';
         }
       </section>
       <p class="formula-note">
-        Goal progress measures logged time, not skill mastery. Percentages = logged minutes ÷ full
-        calendar-period goal, capped at 100%. Raw minutes are always shown.
+        {{
+          'Goal progress measures logged time, not skill mastery. Percentages = logged minutes ÷ full calendar-period goal, capped at 100%. Raw minutes are always shown.'
+            | t
+        }}
       </p>
     }
   `,
@@ -277,8 +294,8 @@ export class DashboardPage {
       {
         label: 'Time invested',
         data: this.trends().map((b) => b.minutes),
-        backgroundColor: '#8b6cf0',
-        borderColor: '#9d82f6',
+        backgroundColor: '#0284c7',
+        borderColor: '#38bdf8',
         borderWidth: 0,
         borderRadius: 4,
       },
@@ -290,7 +307,7 @@ export class DashboardPage {
       {
         data: this.breakdown().map((b) => b.minutes),
         backgroundColor: this.breakdown().map((b) => b.category.color),
-        borderColor: '#141c2e',
+        borderColor: 'transparent',
         borderWidth: 5,
       },
     ],
@@ -320,14 +337,14 @@ export class DashboardPage {
   }
   intensity(minutes: number) {
     return minutes === 0
-      ? '#232d42'
+      ? 'var(--soft)'
       : minutes < 30
-        ? '#43336e'
+        ? '#bae6fd'
         : minutes < 90
-          ? '#6750ad'
+          ? '#7dd3fc'
           : minutes < 120
-            ? '#8968da'
-            : '#ad8aff';
+            ? '#38bdf8'
+            : '#0284c7';
   }
   async load() {
     const request = ++this.request;

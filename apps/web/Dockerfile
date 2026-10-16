@@ -6,6 +6,7 @@ COPY apps/web/package.json apps/web/package.json
 RUN npm ci
 COPY apps/web apps/web
 COPY apps/api/src/common/contracts.ts apps/api/src/common/contracts.ts
+COPY apps/api/src/common/finance-contracts.ts apps/api/src/common/finance-contracts.ts
 RUN npm run build -w apps/web
 FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf

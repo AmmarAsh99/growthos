@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../core/language';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
@@ -6,39 +7,41 @@ import { Api, Notice, errorMessage } from '../core/api';
 import type { Activity, ActivityPage, Category } from '../core/models';
 import { DurationPipe } from '../shared/format';
 @Component({
-  imports: [FormsModule, RouterLink, DurationPipe, CdkTrapFocus],
+  imports: [TranslatePipe, FormsModule, RouterLink, DurationPipe, CdkTrapFocus],
   template: `<div class="page-heading">
       <div>
-        <div class="eyebrow">YOUR JOURNEY, RECORDED</div>
-        <h1>Activity history<span class="heading-dot">.</span></h1>
-        <p>Look back at the time you’ve made for yourself.</p>
+        <div class="eyebrow">{{ 'YOUR JOURNEY, RECORDED' | t }}</div>
+        <h1>{{ 'Activity history' | t }}<span class="heading-dot">.</span></h1>
+        <p>{{ 'Look back at the time you’ve made for yourself.' | t }}</p>
       </div>
-      <a class="button primary" routerLink="/activities/new">＋ Log activity</a>
+      <a class="button primary" routerLink="/activities/new">{{ '＋ Log activity' | t }}</a>
     </div>
     <section class="card">
       <form class="history-filters" (ngSubmit)="page = 1; load()">
         <label
-          >Search<input
+          >{{ 'Search' | t
+          }}<input
             [(ngModel)]="search"
             name="search"
             placeholder="Find an activity…"
             maxlength="120" /></label
-        ><label>From<input type="date" [(ngModel)]="from" name="from" /></label
-        ><label>To<input type="date" [(ngModel)]="to" name="to" /></label
+        ><label>{{ 'From' | t }}<input type="date" [(ngModel)]="from" name="from" /></label
+        ><label>{{ 'To' | t }}<input type="date" [(ngModel)]="to" name="to" /></label
         ><label
-          >Category<select [(ngModel)]="categoryId" name="category">
-            <option value="">All categories</option>
+          >{{ 'Category' | t
+          }}<select [(ngModel)]="categoryId" name="category">
+            <option value="">{{ 'All categories' | t }}</option>
             @for (c of categories(); track c.id) {
               <option [value]="c.id">{{ c.name }}{{ c.isArchived ? ' (archived)' : '' }}</option>
             }
           </select></label
-        ><button class="secondary">Apply filters</button>
+        ><button class="secondary">{{ 'Apply filters' | t }}</button>
       </form>
       @if (error()) {
         <p class="error" role="alert">{{ error() }}</p>
       }
       @if (loading()) {
-        <div class="skeleton" role="status">Loading activities…</div>
+        <div class="skeleton" role="status">{{ 'Loading activities…' | t }}</div>
       } @else if (data(); as d) {
         <div class="history-summary">
           <strong>{{ d.total }} activities</strong
@@ -48,11 +51,13 @@ import { DurationPipe } from '../shared/format';
           <table>
             <thead>
               <tr>
-                <th>Activity</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Duration</th>
-                <th><span class="sr-only">Actions</span></th>
+                <th>{{ 'Activity' | t }}</th>
+                <th>{{ 'Category' | t }}</th>
+                <th>{{ 'Date' | t }}</th>
+                <th>{{ 'Duration' | t }}</th>
+                <th>
+                  <span class="sr-only">{{ 'Actions' | t }}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -72,17 +77,19 @@ import { DurationPipe } from '../shared/format';
                   <td>{{ a.activityDate }}</td>
                   <td>{{ a.durationMinutes | duration }}</td>
                   <td class="row-actions">
-                    <a [routerLink]="['/activities', a.id, 'edit']">Edit</a
-                    ><button class="text-button danger" (click)="deleting.set(a)">Delete</button>
+                    <a [routerLink]="['/activities', a.id, 'edit']">{{ 'Edit' | t }}</a
+                    ><button class="text-button danger" (click)="deleting.set(a)">
+                      {{ 'Delete' | t }}
+                    </button>
                   </td>
                 </tr>
               } @empty {
                 <tr>
                   <td colspan="5">
                     <div class="empty">
-                      <h3>No activities found</h3>
-                      <p>Try different filters or start with a new entry.</p>
-                      <a routerLink="/activities/new">Log an activity →</a>
+                      <h3>{{ 'No activities found' | t }}</h3>
+                      <p>{{ 'Try different filters or start with a new entry.' | t }}</p>
+                      <a routerLink="/activities/new">{{ 'Log an activity →' | t }}</a>
                     </div>
                   </td>
                 </tr>
@@ -94,13 +101,13 @@ import { DurationPipe } from '../shared/format';
           <span>Page {{ page }} of {{ d.totalPages || 1 }}</span>
           <div>
             <button class="secondary" [disabled]="page <= 1" (click)="page = page - 1; load()">
-              ← Previous</button
+              {{ '← Previous' | t }}</button
             ><button
               class="secondary"
               [disabled]="page >= d.totalPages"
               (click)="page = page + 1; load()"
             >
-              Next →
+              {{ 'Next →' | t }}
             </button>
           </div>
         </div>
@@ -117,15 +124,15 @@ import { DurationPipe } from '../shared/format';
           [cdkTrapFocusAutoCapture]="true"
           (keydown.escape)="deleting.set(null)"
         >
-          <h2 id="delete-title">Delete this activity?</h2>
+          <h2 id="delete-title">{{ 'Delete this activity?' | t }}</h2>
           <p>
             “{{ a.title }}” will be removed. Your totals and goal progress will be recalculated.
           </p>
           <div class="form-actions">
             <button class="secondary" (click)="deleting.set(null)" [disabled]="busy()">
-              Keep activity</button
+              {{ 'Keep activity' | t }}</button
             ><button class="danger-button" (click)="remove(a)" [disabled]="busy()">
-              {{ busy() ? 'Deleting…' : 'Delete activity' }}
+              {{ (busy() ? 'Deleting…' : 'Delete activity') | t }}
             </button>
           </div>
         </section>

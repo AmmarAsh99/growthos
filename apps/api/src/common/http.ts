@@ -32,7 +32,7 @@ export class ErrorFilter implements ExceptionFilter {
     const status =
       error instanceof HttpException
         ? error.getStatus()
-        : prismaCode === 'P2002'
+        : prismaCode === 'P2002' || prismaCode === 'P2034'
           ? 409
           : prismaCode === 'P2025'
             ? 404
@@ -73,6 +73,7 @@ export class ErrorFilter implements ExceptionFilter {
         },
         'Request failed',
       );
+    res.locals.errorCode = code;
     res.status(status).json({
       success: false,
       error: {
@@ -81,7 +82,7 @@ export class ErrorFilter implements ExceptionFilter {
           status >= 500
             ? 'Service temporarily unavailable'
             : status === 409
-              ? 'An account or category already exists'
+              ? 'A record already exists or changed concurrently. Reload and try again.'
               : Array.isArray(messages)
                 ? 'The request contains invalid fields'
                 : messages || 'Request failed',

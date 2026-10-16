@@ -16,7 +16,78 @@ model User {
   categories Category[]
   activities Activity[]
   sessions RefreshSession[]
+  financeSettings FinanceSettings?
+  financeMonths FinanceMonth[]
+  financeCategories FinanceCategory[]
+  transactions FinanceTransaction[]
   @@map("users")
+}
+model FinanceSettings {
+  userId String @id @db.Uuid
+  currency String @default("SAR")
+  timezone String @default("Asia/Riyadh")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("finance_settings")
+}
+model FinanceMonth {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  month String @db.VarChar(7)
+  salaryHalalas Int
+  warningPercent Int @default(80)
+  categoryRules Json
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  envelopes FinanceEnvelope[]
+  @@unique([userId, month])
+  @@unique([id, userId])
+  @@map("finance_months")
+}
+model FinanceEnvelope {
+  id String @id @default(uuid()) @db.Uuid
+  monthId String @db.Uuid
+  userId String @db.Uuid
+  key String @db.VarChar(40)
+  name String @db.VarChar(60)
+  kind String @db.VarChar(20)
+  discretionary Boolean @default(false)
+  amountHalalas Int
+  month FinanceMonth @relation(fields: [monthId, userId], references: [id, userId], onDelete: Cascade)
+  transactions FinanceTransaction[]
+  @@unique([monthId, key])
+  @@unique([id, userId])
+  @@map("finance_envelopes")
+}
+model FinanceCategory {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  name String @db.VarChar(60)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions FinanceTransaction[]
+  @@unique([userId, name])
+  @@unique([id, userId])
+  @@map("finance_categories")
+}
+model FinanceTransaction {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  categoryId String? @db.Uuid
+  envelopeId String? @db.Uuid
+  kind String @db.VarChar(20)
+  amountHalalas Int
+  date DateTime @db.Date
+  time String? @db.VarChar(5)
+  description String @db.VarChar(160)
+  notes String? @db.VarChar(2000)
+  merchant String? @db.VarChar(100)
+  frequency String? @db.VarChar(20)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category FinanceCategory? @relation(fields: [categoryId, userId], references: [id, userId], onDelete: Restrict)
+  envelope FinanceEnvelope? @relation(fields: [envelopeId, userId], references: [id, userId], onDelete: Restrict)
+  @@index([userId, date(sort: Desc)])
+  @@index([userId, envelopeId, date])
+  @@map("finance_transactions")
 }
 model UserSettings {
   userId String @id @db.Uuid

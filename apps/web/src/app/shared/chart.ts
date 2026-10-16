@@ -1,4 +1,5 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, inject } from '@angular/core';
+import { Theme } from '../core/theme';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartData, ChartOptions, ChartType } from 'chart.js';
 @Component({
@@ -17,6 +18,8 @@ import type { ChartData, ChartOptions, ChartType } from 'chart.js';
     <p class="sr-only">{{ summary() }}</p>`,
 })
 export class GrowthChart {
+  theme = inject(Theme);
+  unit = input<'minutes' | 'SAR'>('minutes');
   data = input.required<ChartData>();
   type = input<ChartType>('bar');
   summary = input.required<string>();
@@ -25,11 +28,14 @@ export class GrowthChart {
     animation: false,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: this.data().datasets.length > 1,
+        labels: { color: this.theme.dark() ? '#b9cce1' : '#475569', usePointStyle: true },
+      },
       tooltip: {
         callbacks: {
           label: (c) =>
-            `${c.dataset.label || c.label || 'Time'}: ${typeof c.raw === 'number' ? c.raw : 0} minutes`,
+            `${c.dataset.label || c.label || 'Total'}: ${typeof c.raw === 'number' ? c.raw.toLocaleString('en-SA', { maximumFractionDigits: 2 }) : 0} ${this.unit()}`,
         },
       },
     },
@@ -37,8 +43,15 @@ export class GrowthChart {
       ? {}
       : {
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#96a3bd', maxTicksLimit: 8 } },
-            y: { beginAtZero: true, grid: { color: '#202a40' }, ticks: { color: '#96a3bd' } },
+            x: {
+              grid: { display: false },
+              ticks: { color: this.theme.dark() ? '#b9cce1' : '#475569', maxTicksLimit: 8 },
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: this.theme.dark() ? '#24374e' : '#e2eaf4' },
+              ticks: { color: this.theme.dark() ? '#b9cce1' : '#475569' },
+            },
           },
         }),
   }));
