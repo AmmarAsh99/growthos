@@ -1,9 +1,6 @@
 name: Build and Push Images to dockerhub
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 env:
   COMMIT_SHA: ${{ github.sha }}
@@ -29,7 +26,7 @@ jobs:
           file: apps/web/Dockerfile
           target: runtime
           push: true
-          tags: ${{ env.DOCKERHUB_USER }}/growthos-frontend:${{ env.COMMIT_SHA }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/growthos-frontend:${{ env.COMMIT_SHA }}
 
   Build-push-Backend:
     runs-on: ubuntu-latest
@@ -51,7 +48,7 @@ jobs:
           file: apps/api/Dockerfile
           target: runtime
           push: true
-          tags: ${{ env.DOCKERHUB_USER }}/growthos-backend:${{ env.COMMIT_SHA }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/growthos-backend:${{ env.COMMIT_SHA }}
 
   Build-push-db-push:
     runs-on: ubuntu-latest
@@ -73,4 +70,4 @@ jobs:
           file: apps/api/Dockerfile
           target: build
           push: true
-          tags: ${{ env.DOCKERHUB_USER }}/growthos-db-push:${{ env.COMMIT_SHA }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/growthos-db-push:${{ env.COMMIT_SHA }}
