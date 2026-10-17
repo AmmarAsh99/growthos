@@ -168,6 +168,26 @@ on reload and mobile layout. Set `E2E_BASE_URL=http://localhost:4200` to test lo
 development instead. CI runs all checks with ephemeral PostgreSQL and Chromium.
 See [build evidence](BUILD_PROGRESS.md) for commands actually executed here.
 
+## Continuous integration
+
+[CI](.github/workflows/ci.yaml) runs on every push, pull request, and manual
+dispatch from the GitHub Actions tab. It uses Node 24.21.0 and `npm ci` with the
+committed lockfile and an npm download cache.
+
+The **Build and test** job generates the Prisma client, checks lint, formatting
+and types, runs API/web unit tests, builds both apps, applies migrations to an
+ephemeral PostgreSQL 18.6 `growthos_test` database, and runs API integration tests.
+The **Docker and browser tests** job then builds and starts the Compose stack,
+waits for healthy services, and runs all Playwright tests in Chromium. Its database
+and generated JWT secrets exist only for that run; no repository secrets or demo
+seed are required. Browser reports, screenshots and failure traces are retained
+for seven days under the run's artifacts, and service logs appear on failure.
+
+Commit and push the workflow to enable it. To require CI before merging, configure
+your repository's branch protection/ruleset to require **Build and test** and
+**Docker and browser tests**. The separate manual Docker Hub publishing workflow
+does not run these checks automatically; CI itself does not publish images.
+
 ## Optional synthetic demo seed
 
 Seeding is an explicit development-only command. Set `DEMO_SEED=true`,

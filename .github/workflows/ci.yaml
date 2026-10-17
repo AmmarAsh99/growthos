@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://growthos:ci-only-password@localhost:5432/growthos_test
+      TEST_DATABASE_URL: postgresql://growthos:ci-only-password@localhost:5432/growthos_test
+      CORS_ORIGIN: http://localhost:4200
+      COOKIE_SECURE: 'false'
+      METRICS_ENABLED: 'true'
+      OTEL_ENABLED: 'false'
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_USER: growthos
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: growthos_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U growthos -d growthos_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.21.0'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Generate test JWT secrets
+        run: |
+          node --input-type=module <<'NODE'
+          import { randomBytes } from 'node:crypto';
+          import { appendFileSync } from 'node:fs';
+          for (const key of ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET']) {
+            const value = randomBytes(48).toString('hex');
+            console.log(`::add-mask::${value}`);
+            appendFileSync(process.env.GITHUB_ENV, `${key}=${value}\n`);
+          }
+          NODE
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Typecheck API and web
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build API and web
+        run: npm run build
+
+      - name: Apply migrations to test database
+        run: npm run db:migrate
+
+      - name: API integration tests
+        run: npm run test:integration
+
+  browser:
+    name: Docker and browser tests
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      COMPOSE_PROJECT_NAME: growthos-ci
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.21.0'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Create isolated local configuration
+        run: npm run setup
+
+      - name: Build and start Docker stack
+        run: docker compose up --build --detach --wait --wait-timeout 180
+
+      - name: Browser tests against real API
+        run: npm run test:e2e -- --reporter=list,html
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+      - name: Upload browser report and failure traces
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Remove CI containers and temporary database
+        if: always()
+        run: docker compose down --volumes --remove-orphans
