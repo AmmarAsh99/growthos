@@ -2,7 +2,7 @@ import { Injectable, computed, effect, signal } from '@angular/core';
 export type ThemeMode = 'light' | 'dark' | 'system';
 @Injectable({ providedIn: 'root' })
 export class Theme {
-  mode = signal<ThemeMode>('system');
+  mode = signal<ThemeMode>('light');
   private media = matchMedia('(prefers-color-scheme: dark)');
   private systemDark = signal(this.media.matches);
   dark = computed(() => this.mode() === 'dark' || (this.mode() === 'system' && this.systemDark()));
