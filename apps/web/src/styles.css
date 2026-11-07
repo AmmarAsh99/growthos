@@ -1,18 +1,18 @@
 @import 'tailwindcss';
 :root {
-  --bg: #f2f7fd;
+  --bg: #f0fdff;
   --surface: #ffffff;
-  --soft: #edf5ff;
-  --text: #142c48;
-  --muted: #52677e;
-  --border: #dce7f3;
-  --accent: #0369a1;
-  --blue: #0284c7;
+  --soft: #cffafe;
+  --text: #164e63;
+  --muted: #466873;
+  --border: #a5e8f0;
+  --accent: #0e7490;
+  --blue: #0891b2;
   --cyan: #0891b2;
   --danger: #b42342;
   --warning: #935b0b;
   --success: #12734e;
-  --shadow: 0 8px 30px #1b4b8010;
+  --shadow: 0 8px 30px #0891b210;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -22,8 +22,8 @@
   --text: #e5f0fb;
   --muted: #a7bad0;
   --border: #293e57;
-  --accent: #69c9fa;
-  --blue: #38bdf8;
+  --accent: #67e8f9;
+  --blue: #22d3ee;
   --cyan: #67e8f9;
   --danger: #fda4af;
   --warning: #fcd386;
@@ -168,7 +168,7 @@ body > app-root > aside {
   border-radius: 10px;
   font-size: 28px;
   font-weight: 500;
-  box-shadow: 0 5px 20px #8057e530;
+  box-shadow: 0 5px 20px #0891b230;
 }
 .nav-label {
   font-size: 9px;
@@ -198,7 +198,7 @@ nav > a:hover {
   color: white;
 }
 nav > a.active {
-  background: #8c6aed21;
+  background: #06b6d421;
   color: var(--accent);
   box-shadow: inset 3px 0 var(--accent);
 }
@@ -321,7 +321,7 @@ button.secondary,
 .primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 14px #8863d722;
+  box-shadow: 0 4px 14px #0891b222;
 }
 .primary:hover {
   background: var(--accent);
@@ -829,7 +829,7 @@ legend {
 }
 .info-note {
   font-size: 12px;
-  background: #7056b821;
+  background: #06b6d421;
   color: var(--accent);
   border-inline-start: 3px solid var(--accent);
   padding: 14px;
@@ -1000,7 +1000,7 @@ input[type='color'] {
 }
 .auth-story {
   padding: 50px 12%;
-  background: radial-gradient(ellipse at 30% 70%, #4a367348, transparent 60%), var(--border);
+  background: radial-gradient(ellipse at 30% 70%, #06b6d448, transparent 60%), var(--border);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1076,8 +1076,8 @@ input[type='color'] {
   max-width: 350px;
 }
 .auth-art i {
-  background: linear-gradient(#ac87ef77, #7965c922);
-  border: 1px solid #b998ff33;
+  background: linear-gradient(#22d3ee77, #0891b222);
+  border: 1px solid #06b6d433;
   border-radius: 6px 6px 0 0;
   flex: 1;
   height: 20%;
@@ -1099,7 +1099,7 @@ input[type='color'] {
 }
 .auth-art i:nth-child(7) {
   height: 100%;
-  background: linear-gradient(#b99becaa, #7b66c944);
+  background: linear-gradient(#22d3eeaa, #0891b244);
 }
 .mobile-menu {
   display: none;
@@ -1480,7 +1480,7 @@ input[type='color'] {
 
 /* Shared surfaces and controls apply to both the original activity pages and finance. */
 .workspace {
-  background: radial-gradient(ellipse at 90% 0%, #0284c70c, transparent 50%), var(--bg);
+  background: radial-gradient(ellipse at 90% 0%, #0891b20c, transparent 50%), var(--bg);
 }
 body > app-root > aside,
 .topbar,
@@ -1523,11 +1523,11 @@ body > app-root > aside {
 }
 .brand-mark,
 .primary {
-  background: linear-gradient(120deg, #0284c7, #2563eb);
+  background: linear-gradient(120deg, #0891b2, #0e7490);
   color: white;
 }
 .primary:hover {
-  background: linear-gradient(120deg, #0369a1, #1d4ed8);
+  background: linear-gradient(120deg, #0e7490, #155e75);
 }
 .progress,
 .metric-icon,
@@ -1539,7 +1539,7 @@ th {
   background: var(--soft);
 }
 .progress i {
-  background: linear-gradient(90deg, #0284c7, #38bdf8);
+  background: linear-gradient(90deg, #0891b2, #22d3ee);
 }
 .metric-value,
 .empty h3,
@@ -1576,12 +1576,13 @@ td strong {
   border-color: var(--success);
 }
 .auth-story {
-  background: radial-gradient(ellipse at 20% 70%, #0284c722, transparent 65%), var(--soft);
+  background: linear-gradient(145deg, #06b6d4, #a5f3fc);
+  color: #164e63;
 }
 .auth-art i,
 .auth-art i:nth-child(7) {
-  background: linear-gradient(#38bdf877, #0284c722);
-  border-color: #0284c733;
+  background: linear-gradient(#22d3ee77, #0891b222);
+  border-color: #0891b233;
 }
 .skeleton {
   background: linear-gradient(100deg, var(--surface) 20%, var(--soft) 50%, var(--surface) 80%);
@@ -1817,4 +1818,14 @@ input[type='time'] {
   .language-control {
     margin-inline-start: auto;
   }
+}
+
+/* Keep the cyan welcome panel readable in either saved theme. */
+.auth-story h1 > span,
+.auth-story .brand > span:last-child:not(.brand-mark) {
+  color: #155e75;
+}
+.auth-story p,
+.auth-story small {
+  color: #164e63;
 }
