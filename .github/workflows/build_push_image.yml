@@ -71,3 +71,78 @@ jobs:
           target: build
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/growthos-db-push:${{ env.COMMIT_SHA }}
+
+  Update-GitOps:
+    needs:
+      - Build-push-Frontend
+      - Build-push-Backend
+      - Build-push-db-push
+
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v6
+        with:
+          repository: AmmarAsh99/growthos-gitops
+          ref: main
+          token: ${{ secrets.GITOPS_TOKEN }}
+
+      - name: Update application image tags
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          username = os.environ["DOCKERHUB_USERNAME"]
+          sha = os.environ["COMMIT_SHA"]
+
+          images = {
+              "growthos-web.yaml": "growthos-frontend",
+              "growthos-api.yaml": "growthos-backend",
+              "migration-job.yaml": "growthos-db-push",
+          }
+
+          for filename, image in images.items():
+              path = Path(filename)
+              content = path.read_text()
+              pattern = (
+                  rf"(?m)^([ \t]*image:[ \t]*)"
+                  rf"\S+/{re.escape(image)}:[^\s#]+"
+                  rf"([ \t]*(?:#.*)?)$"
+              )
+              updated, count = re.subn(
+                  pattern,
+                  lambda match: (
+                      f"{match[1]}{username}/{image}:{sha}{match[2]}"
+                  ),
+                  content,
+              )
+              if count != 1:
+                  raise SystemExit(
+                      f"Expected exactly one {image} image in {filename}; "
+                      f"found {count}"
+                  )
+              path.write_text(updated)
+          PY
+
+      - name: Commit and push image updates
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add growthos-web.yaml growthos-api.yaml migration-job.yaml
+
+          if git diff --cached --quiet; then
+            echo "Image tags are already up to date."
+            exit 0
+          fi
+
+          git commit -m "Deploy application ${COMMIT_SHA}"
+          git push origin HEAD:main
